@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quick Win Assessment - SolutionCraft.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        const state = {
+            currentQuestion: 0,
+            answers: {},
+            showResults: false
+        };
+
+        const questions = [
+            {
+                id: 'time_drain',
+                question: "What's the ONE task your team dreads most because it's repetitive and time-consuming?",
+                type: 'textarea',
+                placeholder: 'e.g., Data entry from emails into spreadsheets, scheduling appointments, following up with leads...'
+            },
+            {
+                id: 'frequency',
+                question: "How often does this task happen?",
+                type: 'radio',
+                options: [
+                    'Multiple times per day',
+                    'Daily',
+                    'Weekly',
+                    'Monthly'
+                ]
+            },
+            {
+                id: 'time_spent',
+                question: "Roughly how much time does this task take per week?",
+                type: 'radio',
+                options: [
+                    'Less than 2 hours',
+                    '2-5 hours',
+                    '5-10 hours',
+                    'More than 10 hours'
+                ]
+            },
+            {
+                id: 'manual_steps',
+                question: "Does this task involve copying information between systems or apps?",
+                type: 'radio',
+                options: [
+                    'Yes, constantly',
+                    'Yes, sometimes',
+                    'Not really',
+                    'No'
+                ]
+            },
+            {
+                id: 'consistency',
+                question: "Does this task follow the same steps every time, or does it vary?",
+                type: 'radio',
+                options: [
+                    'Pretty much the same every time',
+                    'Mostly the same with minor variations',
+                    'It varies quite a bit',
+                    'Completely different each time'
+                ]
+            },
+            {
+                id: 'urgency',
+                question: "If you could wave a magic wand and never do this task again, how would that change your business?",
+                type: 'textarea',
+                placeholder: 'Think about: time freed up, reduced errors, faster response times, happier team...'
+            }
+        ];
+
+        function getAutomationScore() {
+            let score = 0;
+            
+            if (state.answers.frequency === 'Multiple times per day') score += 3;
+            else if (state.answers.frequency === 'Daily') score += 2;
+            else if (state.answers.frequency === 'Weekly') score += 1;
+            
+            if (state.answers.time_spent === 'More than 10 hours') score += 3;
+            else if (state.answers.time_spent === '5-10 hours') score += 2;
+            else if (state.answers.time_spent === '2-5 hours') score += 1;
+            
+            if (state.answers.manual_steps === 'Yes, constantly') score += 3;
+            else if (state.answers.manual_steps === 'Yes, sometimes') score += 2;
+            
+            if (state.answers.consistency === 'Pretty much the same every time') score += 3;
+            else if (state.answers.consistency === 'Mostly the same with minor variations') score += 2;
+            
+            return score;
+        }
+
+        function getRecommendation() {
+            const score = getAutomationScore();
+            
+            if (score >= 9) {
+                return {
+                    title: "🎯 Perfect Quick Win Candidate",
+                    message: "This is exactly the type of task AI automation excels at. Based on your answers, you could likely see results within 2-3 weeks.",
+                    impact: "High frequency + significant time investment + repetitive nature = maximum ROI",
+                    nextStep: "Let's schedule a 20-minute call to map out exactly how this would work in your business."
+                };
+            } else if (score >= 5) {
+                return {
+                    title: "✅ Strong Automation Opportunity",
+                    message: "This task has excellent automation potential. With the right approach, you could reclaim significant time each week.",
+                    impact: "Good combination of repetition and time savings",
+                    nextStep: "Let's have a quick conversation to explore the specifics and identify the fastest path to results."
+                };
+            } else {
+                return {
+                    title: "💡 Worth Exploring Further",
+                    message: "This task might be automatable, but let's make sure we find your highest-impact opportunity first.",
+                    impact: "There may be other processes that would give you faster wins",
+                    nextStep: "Let's chat about your day-to-day operations to uncover where AI can help most."
+                };
+            }
+        }
+
+        function handleAnswer(value) {
+            state.answers[questions[state.currentQuestion].id] = value;
+            render();
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion < questions.length - 1) {
+                state.currentQuestion++;
+            } else {
+                state.showResults = true;
+            }
+            render();
+        }
+
+        function previousQuestion() {
+            if (state.currentQuestion > 0) {
+                state.currentQuestion--;
+                render();
+            }
+        }
+
+        function restart() {
+            state.currentQuestion = 0;
+            state.answers = {};
+            state.showResults = false;
+            render();
+        }
+
+        function renderResults() {
+            const recommendation = getRecommendation();
+            
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 p-6">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+                            <div class="text-center mb-4">
+                                <img src="./logo.png" alt="SolutionCraft.ai" class="w-20 h-20 mx-auto mb-6">
+                                <div class="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
+                                    <svg class="w-10 h-10 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                                    ${recommendation.title}
+                                </h2>
+                            </div>
+
+                            <div class="space-y-6 mb-8">
+                                <div class="bg-blue-50 border-l-4 border-blue-700 p-6 rounded-r-lg">
+                                    <p class="text-lg text-gray-800 mb-4">${recommendation.message}</p>
+                                    <p class="text-sm text-gray-600 italic">${recommendation.impact}</p>
+                                </div>
+
+                                <div class="bg-gray-50 p-6 rounded-lg">
+                                    <h3 class="font-semibold text-gray-900 mb-3">Your Task Snapshot:</h3>
+                                    <div class="space-y-2 text-sm text-gray-700">
+                                        <p><strong>The task:</strong> ${state.answers.time_drain}</p>
+                                        <p><strong>Frequency:</strong> ${state.answers.frequency}</p>
+                                        <p><strong>Time investment:</strong> ${state.answers.time_spent} per week</p>
+                                        <p><strong>Potential impact:</strong> ${state.answers.urgency}</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-orange-50 border border-orange-200 p-6 rounded-lg">
+                                    <h3 class="font-semibold text-orange-900 mb-2">Next Step:</h3>
+                                    <p class="text-orange-800">${recommendation.nextStep}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button onclick="restart()" class="flex-1 flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Start Over
+                                </button>
+                                <a href="mailto:your@email.com?subject=SolutionCraft - AI Quick Win Consultation" class="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all font-semibold shadow-md">
+                                    Schedule a Call
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuestion() {
+            const currentQ = questions[state.currentQuestion];
+            const isAnswered = state.answers[currentQ.id] !== undefined && state.answers[currentQ.id] !== '';
+            const progress = ((state.currentQuestion + 1) / questions.length) * 100;
+
+            let inputHTML = '';
+            if (currentQ.type === 'textarea') {
+                inputHTML = `
+                    <textarea 
+                        id="answer-input"
+                        placeholder="${currentQ.placeholder}"
+                        class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-orange-500 focus:outline-none min-h-32 text-gray-800"
+                    >${state.answers[currentQ.id] || ''}</textarea>
+                `;
+            } else {
+                inputHTML = `<div class="space-y-3">
+                    ${currentQ.options.map((option, index) => `
+                        <label class="block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                            state.answers[currentQ.id] === option
+                                ? 'border-orange-500 bg-orange-50'
+                                : 'border-gray-200 hover:border-orange-300'
+                        }">
+                            <input 
+                                type="radio" 
+                                name="${currentQ.id}" 
+                                value="${option}"
+                                ${state.answers[currentQ.id] === option ? 'checked' : ''}
+                                onchange="handleAnswer('${option}')"
+                                class="mr-3"
+                            />
+                            <span class="text-gray-800">${option}</span>
+                        </label>
+                    `).join('')}
+                </div>`;
+            }
+
+            return `
+                <div class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 p-6">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="mb-8 text-center">
+                            <img src="./logo.png" alt="SolutionCraft.ai" class="w-24 h-24 mx-auto mb-4">
+                            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">
+                                AI Quick Win Assessment
+                            </h1>
+                            <p class="text-blue-200">
+                                Find your first automation opportunity in under 3 minutes
+                            </p>
+                        </div>
+
+                        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+                            <div class="mb-8">
+                                <div class="flex justify-between text-sm text-gray-600 mb-2">
+                                    <span>Question ${state.currentQuestion + 1} of ${questions.length}</span>
+                                    <span>${Math.round(progress)}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="h-2 rounded-full transition-all duration-300" 
+                                         style="width: ${progress}%; background: linear-gradient(to right, #f97316, #ea580c)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
+                                    ${currentQ.question}
+                                </h2>
+                                ${inputHTML}
+                            </div>
+
+                            <div class="flex gap-4">
+                                ${state.currentQuestion > 0 ? `
+                                    <button onclick="previousQuestion()" class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                                        Back
+                                    </button>
+                                ` : ''}
+                                <button 
+                                    onclick="nextQuestion()" 
+                                    ${!isAnswered ? 'disabled' : ''}
+                                    class="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+                                        isAnswered
+                                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }">
+                                    ${state.currentQuestion === questions.length - 1 ? 'See Results' : 'Next'}
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            app.innerHTML = state.showResults ? renderResults() : renderQuestion();
+            
+            // Add textarea listener if it exists
+            const textarea = document.getElementById('answer-input');
+            if (textarea) {
+                textarea.addEventListener('input', (e) => {
+                    handleAnswer(e.target.value);
+                });
+            }
+        }
+
+        // Make functions globally available
+        window.handleAnswer = handleAnswer;
+        window.nextQuestion = nextQuestion;
+        window.previousQuestion = previousQuestion;
+        window.restart = restart;
+
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
